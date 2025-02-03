@@ -1,23 +1,30 @@
 const express = require('express');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken'); // Para generar un token JWT
+const bcrypt = require('bcryptjs'); // Importar bcryptjs para cifrar contraseñas
 
 const router = express.Router();
 
 // Ruta para registro de usuario
 router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
+  
   try {
+    // Verificar si el correo ya está registrado
     const userExists = await User.findOne({ email });
 
     if (userExists) {
       return res.status(400).json({ message: 'El correo ya está registrado' });
     }
 
+    // Cifrar la contraseña antes de guardarla
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Crear un nuevo usuario con la contraseña cifrada
     const newUser = new User({
       username,
       email,
-      password
+      password: hashedPassword, // Guardar la contraseña cifrada
     });
 
     await newUser.save();
@@ -32,13 +39,15 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // Buscar al usuario por correo electrónico
     const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(400).json({ message: 'Correo o contraseña incorrectos' });
     }
 
-    const isMatch = await user.matchPassword(password);
+    // Comparar la contraseña ingresada con la almacenada en la base de datos
+    const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(400).json({ message: 'Correo o contraseña incorrectos' });

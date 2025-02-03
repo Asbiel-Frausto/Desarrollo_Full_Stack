@@ -17,10 +17,11 @@ const MONGO_URI = process.env.MONGO_URI;
 
 // Conexión a la base de datos
 mongoose
-  .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(MONGO_URI) // Elimina las opciones 'useNewUrlParser' y 'useUnifiedTopology'
   .then(() => {
     app.listen(PORT, () => {
       console.log(`Servidor corriendo en el puerto ${PORT}`);
     });
   })
   .catch((err) => console.error(err));
+

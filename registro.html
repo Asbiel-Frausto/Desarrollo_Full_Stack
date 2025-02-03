@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro</title>
+</head>
+<body>
+  <h1>Crear Cuenta</h1>
+  <form id="registerForm">
+    <input type="email" id="email" placeholder="Correo electrónico" required>
+    <input type="password" id="password" placeholder="Contraseña" required>
+    <button type="submit">Registrarse</button>
+  </form>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      // Enviar los datos al backend
+      const response = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),  // Enviar los datos como JSON
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Registro exitoso, ya puedes iniciar sesión');
+        // Redirigir al formulario de inicio de sesión o mostrar un mensaje
+      } else {
+        alert(data.message || 'Hubo un error al registrar el usuario');
+      }
+    });
+  </script>
+</body>
+</html>
